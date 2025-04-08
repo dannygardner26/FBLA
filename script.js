@@ -86,7 +86,8 @@
             }
             document.getElementById('loginModal').style.display = 'block';
         };
-
+        
+        // Login logic by checking if both submitted fields exists in local storage
         document.getElementById('loginForm').onsubmit = (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
@@ -108,11 +109,14 @@
             }
         };
 
-        // Registration
+        // Registration 
+
+        // Pressing the link to display the registration modal
         document.getElementById('registerLink').onclick = () => {
             document.getElementById('registerModal').style.display = 'block';
         };
 
+        // Logic to enter role field which will change the modal fields appropriately
         document.getElementById('roleSelect').onchange = (e) => {
             const studentFields = document.getElementById('studentFields');
             const employerFields = document.getElementById('employerFields');
@@ -121,6 +125,7 @@
             employerFields.style.display = e.target.value === 'employer' ? 'block' : 'none';
         };
 
+        // Submitting logic and check if required fields are filled
         document.getElementById('registerForm').onsubmit = (e) => {
             e.preventDefault();
             const role = document.getElementById('roleSelect').value;
@@ -129,6 +134,7 @@
                 return;
             }
 
+            // Assign fields to variables
             const formData = new FormData(e.target);
             const userData = {
                 id: Date.now().toString(),
@@ -138,6 +144,7 @@
                 role: role
             };
 
+            
             if (role === 'student') {
                 userData.fullName = formData.get('fullName');
                 userData.gradeLevel = formData.get('gradeLevel');
@@ -146,6 +153,7 @@
                 userData.website = formData.get('website');
             }
 
+            // Checking if account already exists
             const users = getData(STORAGE_KEYS.USERS);
             if (users.some(user => user.username === userData.username)) {
                 showToast('Username already exists', true);
@@ -156,6 +164,7 @@
             saveData(STORAGE_KEYS.USERS, users);
             localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(userData));
 
+            // Defaulting the screen
             closeAllModals();
             e.target.reset();
             document.getElementById('roleSelect').value = '';
@@ -168,6 +177,8 @@
         // Job Management
         document.getElementById('createJobBtn').onclick = () => {
             const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
+
+            // Make sure the user is logged in and is an employer
             if (!currentUser || currentUser.role !== 'employer') {
                 showToast('Please login as an employer to post jobs', true);
                 return;
@@ -175,6 +186,7 @@
             document.getElementById('postJobModal').style.display = 'block';
         };
 
+        // Submitting a job posting and uploading it to local storage
         document.getElementById('postJobForm').onsubmit = (e) => {
             e.preventDefault();
             const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
@@ -223,6 +235,7 @@
             document.getElementById('adminModal').style.display = 'block';
         };
 
+        // Function to display jobs tb approved
         function renderPendingJobs() {
             const pendingJobs = getData(STORAGE_KEYS.JOBS).filter(job => job.status === 'pending');
             const container = document.getElementById('pendingJobs');
@@ -244,6 +257,8 @@
         }
 
         // Job Actions
+
+        // Approve button logic
         window.approveJob = (jobId) => {
             const jobs = getData(STORAGE_KEYS.JOBS);
             const jobIndex = jobs.findIndex(job => job.id === jobId);
@@ -257,6 +272,7 @@
             }
         };
 
+        // Reject button logic
         window.rejectJob = (jobId) => {
             const jobs = getData(STORAGE_KEYS.JOBS);
             const jobIndex = jobs.findIndex(job => job.id === jobId);
@@ -276,6 +292,7 @@
             const jobs = getData(STORAGE_KEYS.JOBS)
                 .filter(job => job.status === 'approved')
                 .filter(job =>
+                    // Allowing search by title, company, and description case insensitive
                     job.title.toLowerCase().includes(searchTerm) ||
                     job.company.toLowerCase().includes(searchTerm) ||
                     job.description.toLowerCase().includes(searchTerm)
@@ -284,6 +301,7 @@
             renderJobs(jobs);
         };
 
+        // Function to render jobs on the page
         function renderJobs(jobsToDisplay) {
             const jobs = jobsToDisplay || getData(STORAGE_KEYS.JOBS).filter(job => job.status === 'approved');
             const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_USER));
@@ -433,6 +451,7 @@
             modal.style.display = 'block';
         };
 
+        // Update application status
         window.handleApplication = (applicationId, status) => {
             const applications = getData(STORAGE_KEYS.APPLICATIONS);
             const index = applications.findIndex(app => app.id === applicationId);
