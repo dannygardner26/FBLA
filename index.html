@@ -541,6 +541,8 @@
 
     <script>
         // Storage Configuration
+
+        // To be stored on local storage
         const STORAGE_KEYS = {
             JOBS: 'jobs',
             USERS: 'users',
@@ -554,6 +556,7 @@
                 localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify([]));
             }
             if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
+                // Predetermined admin account to approve postings
                 localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([{
                     id: 'admin1',
                     username: 'admin',
@@ -565,24 +568,33 @@
                 localStorage.setItem(STORAGE_KEYS.APPLICATIONS, JSON.stringify([]));
             }
         }
-
+        localStorage.clear();
         // Utility Functions
-        function getData(key) {
-            return JSON.parse(localStorage.getItem(key)) || [];
-        }
 
-        function saveData(key, data) {
-            localStorage.setItem(key, JSON.stringify(data));
-        }
-
+        // Function to display a toast notification
         function showToast(message, isError = false) {
+            // Get the toast element by its ID
             const toast = document.getElementById('toast');
+            
+            //set toast type text to toast msg
             toast.textContent = message;
+            
+            // Apply appropriate class type to toast
             toast.className = `toast ${isError ? 'error' : ''}`;
             toast.style.display = 'block';
+            
+            // Automatically hide the toast after 3 seconds
             setTimeout(() => {
                 toast.style.display = 'none';
             }, 3000);
+        }
+
+        //helper getter and setter functions for local storage
+        function getData(key) {
+            return JSON.parse(localStorage.getItem(key)) || [];
+        }
+        function saveData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
         }
 
         // Modal Management
@@ -592,10 +604,12 @@
             });
         }
 
+        // Assigns a close button to all modals
         document.querySelectorAll('.modal .close').forEach(closeBtn => {
             closeBtn.onclick = () => closeBtn.closest('.modal').style.display = 'none';
         });
 
+        // Allows user to close modal by clicking outside of it
         window.onclick = (event) => {
             if (event.target.classList.contains('modal')) {
                 event.target.style.display = 'none';
